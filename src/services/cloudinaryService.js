@@ -40,19 +40,7 @@ const uploadImage = async (file, tags) => {
 // Search images by tag
 const searchImagesByTag = async (tag) => {
   try {
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/resources/search`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Basic ${btoa(`${API_KEY}:${API_SECRET}`)}`,
-        },
-        body: JSON.stringify({
-          expression: `tags:${tag}`,
-        }),
-      }
-    );
+    const response = await fetch(`http://localhost:3001/api/images/${tag}`);
     return await response.json();
   } catch (error) {
     console.error("Search failed:", error);

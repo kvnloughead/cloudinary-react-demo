@@ -9,6 +9,7 @@ import {
 
 function ImageUploader() {
   const [file, setFile] = useState(null);
+  const [uploadTags, setUploadTags] = useState("");
   const [searchTag, setSearchTag] = useState("");
   const [images, setImages] = useState([]);
 
@@ -21,9 +22,15 @@ function ImageUploader() {
     if (!file) return;
 
     try {
-      const result = await uploadImage(file, ["sample"]);
+      const tagArray = uploadTags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
+
+      const result = await uploadImage(file, tagArray);
       alert("Upload successful!");
       setFile(null);
+      setUploadTags("");
     } catch (error) {
       alert("Upload failed");
     }
@@ -45,7 +52,17 @@ function ImageUploader() {
     <div>
       {/* Upload Form */}
       <form onSubmit={handleUpload}>
-        <input type="file" onChange={handleFileChange} accept="image/*" />
+        <div>
+          <input type="file" onChange={handleFileChange} accept="image/*" />
+        </div>
+        <div>
+          <input
+            type="text"
+            value={uploadTags}
+            onChange={(e) => setUploadTags(e.target.value)}
+            placeholder="Add tags (comma-separated)"
+          />
+        </div>
         <button type="submit">Upload</button>
       </form>
 
@@ -61,15 +78,26 @@ function ImageUploader() {
       </form>
 
       {/* Image Display */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+          marginTop: "20px",
+        }}
+      >
         {images.map((image) => (
-          <AdvancedImage
-            key={image.public_id}
-            cldImg={cld
-              .image(image.public_id)
-              .resize(fill().width(200).height(200))}
-            alt="Uploaded content"
-          />
+          <div key={image.public_id} style={{ textAlign: "center" }}>
+            <AdvancedImage
+              cldImg={cld
+                .image(image.public_id)
+                .resize(fill().width(200).height(200))}
+              alt="Uploaded content"
+            />
+            <div style={{ fontSize: "0.8em", marginTop: "5px" }}>
+              Tags: {image.tags?.join(", ") || "No tags"}
+            </div>
+          </div>
         ))}
       </div>
     </div>
